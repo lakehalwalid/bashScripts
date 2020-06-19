@@ -1,0 +1,10 @@
+#!/bin/bash
+#this script take directory to compress as first argument
+#and destination as second argument
+apt-get update
+apt-get install zip
+zip -r file $1
+cp file.zip $2
+unzip $2/file.zip -d $2
+rm $2/file.zip
+rm ./file.zip
