@@ -1,2 +1,3 @@
 # bashScripts
-This repository contain scripts that may help for some simple tasks 
+This repository contains scripts that may help for some simple tasks 
+Feel free to use them 
