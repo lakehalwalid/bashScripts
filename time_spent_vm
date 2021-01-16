@@ -1,0 +1,27 @@
+#!/bin/bash
+touch test 
+last --fulltimes > test
+sed -i "s/  still logged in/- $(date | awk '{print $1,$2,$3,$4,$6}')/g" test
+
+input="./test"
+total_duration=0
+while IFS= read -r line
+do
+  if [[ $(echo "$line" | awk '{print $2}') = "pts/0" ]]
+  then
+   debut_time=$(echo "$line" | awk '{print $7}')
+  fin_time=$(echo "$line" | awk '{print $13}')
+
+
+  IFS=":" read -r h m s <<<"$debut_time"
+  debut_seconds=$(($((10#$h + 1))*3600 + $((10#$m + 1))*60 + $((10#$s + 1))))
+  IFS=":" read -r h m s <<<"$fin_time"
+  fin_seconds=$(($((10#$h + 1))*3600 + $((10#$m + 1))*60 + $((10#$s + 1))))
+  time_spent_by_line=$((fin_seconds-debut_seconds))
+  
+  total_duration=$((total_duration+time_spent_by_line))  
+  fi
+done < "$input"
+# echo "scale=2; $((total_duration/3600)).$((total_duration%3600))" | bc
+echo "$total_duration"
+#date -d@$totla_duration -u +%H:%M:%S
