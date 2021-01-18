@@ -1,0 +1,68 @@
+#! /usr/bin/python3
+
+import subprocess
+from datetime import datetime, time
+
+
+def main():
+    process = subprocess.Popen(['last','-F'], stdout=subprocess.PIPE)
+    out, err = process.communicate()
+    #print(out)
+    # decode bytes to python string
+    out = out.decode('utf-8')
+    #print(out)
+    # convert to python list
+    out = out.split('\n')
+    #print(out)
+    end_session= datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+    time_sp= datetime.strptime('00:00:00.000000','%H:%M:%S.%f')
+    start_session_beta= datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+    for o in out:
+        if (len(o) > 10 and o.split()[0] == "ubuntu"):
+            if (o.split()[1] != "pts/0"):
+                if (o.split()[9] == "logged"):
+                    finTab= datetime.now()
+
+                else:
+                    finTab_str2= o.split()[9] + " " + o.split()[10] + " " + o.split()[11] + " " + o.split()[12] + " " + o.split()[13]
+                    finTab= datetime.strptime(finTab_str2,'%a %b %d %H:%M:%S %Y')
+
+                
+                if (start_session_beta > finTab):
+                    time_sp= time_sp + (end_session - start_session_beta)
+
+                    end_session = datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+                    start_session_beta= datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+
+                else:
+                    start_session_beta= datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+
+                if (finTab > end_session):
+                    end_session = finTab
+
+            else:
+                start_session_pts0_str= o.split()[3] + " " + o.split()[4] + " " + o.split()[5] + " " + o.split()[6] + " " + o.split()[7]
+                start_session_pts0 = datetime.strptime(start_session_pts0_str,'%a %b %d %H:%M:%S %Y')
+                
+                if (start_session_beta != datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')):
+                    time_sp= time_sp + (end_session - start_session_beta)
+                    end_session= datetime.strptime('0001-01-01 00:00:00','%Y-%m-%d %H:%M:%S')
+
+                if (o.split()[9] == "logged"):
+                    finTab_pst0= datetime.now()
+                else:
+                    finTab_pst0_str= o.split()[9] + " " + o.split()[10] + " " + o.split()[11] + " " + o.split()[12] + " " + o.split()[13]
+                    finTab_pst0= datetime.strptime(finTab_pst0_str,'%a %b %d %H:%M:%S %Y')
+
+                if (finTab_pst0 > end_session):
+                    end_session = finTab_pst0
+                
+                start_session_beta = start_session_pts0
+        
+    print(time_sp-datetime.strptime('1900-01-01 00:00:00','%Y-%m-%d %H:%M:%S'))
+    print(time_sp)
+
+
+if __name__ == "__main__":
+    main()
+
